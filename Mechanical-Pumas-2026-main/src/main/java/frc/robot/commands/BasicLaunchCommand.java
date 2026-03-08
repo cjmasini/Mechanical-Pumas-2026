@@ -10,9 +10,6 @@ public class BasicLaunchCommand extends Command {
 
     private final LaunchSubsystem launchSubsystem;
 
-    /**
-     * Creates a new LaunchCommand.
-     */
     public BasicLaunchCommand(LaunchSubsystem launchSubsystem) {
         this.launchSubsystem = launchSubsystem;
 
@@ -21,7 +18,7 @@ public class BasicLaunchCommand extends Command {
 
     @Override
     public void initialize() {
-        this.launchSubsystem.setLauncherSpeed(1);
+        this.launchSubsystem.setLauncherPower(.55);
     }
 
 

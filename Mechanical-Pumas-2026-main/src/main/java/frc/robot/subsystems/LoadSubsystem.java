@@ -19,7 +19,10 @@ public class LoadSubsystem extends CancelableSubsystemBase {
      * Loader motor controller.
      * 
      */
-    private final SparkMax loaderMotor;
+    private SparkMax leftLoaderMotor;
+    private SparkMax rightLoaderMotor;
+    private SparkMax conveyorMotor;
+
 
     /**
      * Initialize the Load Subsystem.
@@ -27,26 +30,62 @@ public class LoadSubsystem extends CancelableSubsystemBase {
      */
     public LoadSubsystem() {
         this.setName("LoadSubsystem");
+        prepareLoadMotors();
+    }
 
-        this.loaderMotor = new SparkMax(
-                CANIdConstants.LOADER_ID,
+        private void prepareLoadMotors() {
+        
+        this.leftLoaderMotor = new SparkMax(
+                CANIdConstants.LEFT_LOADER_ID,
                 MotorType.kBrushless);
 
-        SparkMaxConfig loaderConfig = new SparkMaxConfig();
+        this.rightLoaderMotor = new SparkMax(
+                CANIdConstants.RIGHT_LOADER_ID,
+                MotorType.kBrushless);
+
+        this.conveyorMotor = new SparkMax(
+                CANIdConstants.CONVEYOR_MOTOR_ID,
+                MotorType.kBrushless);
+        
+        SparkMaxConfig leftLoaderConfig = new SparkMaxConfig();
+        SparkMaxConfig rightLoaderConfig = new SparkMaxConfig();
+        SparkMaxConfig conveyorConfig = new SparkMaxConfig();
 
         // We may want to switch to brake mode
-        loaderConfig.idleMode(IdleMode.kCoast);
+        leftLoaderConfig.idleMode(IdleMode.kCoast);
 
-        loaderConfig.inverted(true);
+        leftLoaderConfig.inverted(true);
+
+        rightLoaderConfig.idleMode(IdleMode.kCoast);
+
+        rightLoaderConfig.inverted(true);
+
+        conveyorConfig.idleMode(IdleMode.kCoast);
+
+        conveyorConfig.inverted(true);
 
         // 40 Amps and 12 volts are safe settings for most mechanisms.
-        loaderConfig.smartCurrentLimit(40);
-        loaderConfig.voltageCompensation(12.0);
+        leftLoaderConfig.smartCurrentLimit(40);
+        leftLoaderConfig.voltageCompensation(12.0);
+
+        rightLoaderConfig.smartCurrentLimit(40);
+        rightLoaderConfig.voltageCompensation(12.0);
+
+        conveyorConfig.smartCurrentLimit(40);
+        conveyorConfig.voltageCompensation(12.0);
 
         // Configure the SparkMax to use the config.
         // ResetMode.kResetSafeParameters makes sure unsafe params are reset.
-        loaderMotor.configure(
-                loaderConfig,
+        leftLoaderMotor.configure(
+                leftLoaderConfig,
+                ResetMode.kResetSafeParameters,
+                null);
+        rightLoaderMotor.configure(
+                rightLoaderConfig,
+                ResetMode.kResetSafeParameters,
+                null);
+        conveyorMotor.configure(
+                conveyorConfig,
                 ResetMode.kResetSafeParameters,
                 null);
     }
@@ -59,13 +98,17 @@ public class LoadSubsystem extends CancelableSubsystemBase {
      * 
      */
     public void setLoaderSpeed(double speed) {
-        this.loaderMotor.set(speed);
+        this.leftLoaderMotor.set(speed);
+        this.rightLoaderMotor.set(speed);
+        this.conveyorMotor.set(speed);
     }
 
     /**
      * Cancel function to stop the loader motor
      */
     public void cancel() {
-        this.loaderMotor.set(0);
+        this.leftLoaderMotor.set(0);
+        this.rightLoaderMotor.set(0);
+        this.conveyorMotor.set(0);
     }
 }
