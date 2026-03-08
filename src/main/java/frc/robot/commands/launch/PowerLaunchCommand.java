@@ -1,0 +1,38 @@
+package frc.robot.commands.launch;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.LaunchSubsystem;
+
+/**
+ * Spins launch motor at a set speed
+ */
+public class PowerLaunchCommand extends Command {
+
+    private final LaunchSubsystem launchSubsystem;
+
+    public PowerLaunchCommand(LaunchSubsystem launchSubsystem) {
+        this.launchSubsystem = launchSubsystem;
+
+        addRequirements(launchSubsystem);
+    }
+
+    @Override
+    public void initialize() {
+        this.launchSubsystem.setLauncherPower(.55);
+    }
+
+
+    @Override
+    public void execute() {
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        this.launchSubsystem.cancel();
+    }
+}

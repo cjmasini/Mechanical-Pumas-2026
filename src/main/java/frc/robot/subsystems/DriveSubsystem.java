@@ -438,4 +438,12 @@ public class DriveSubsystem extends CancelableSubsystemBase {
   public double getGyroOrientation() {
     return gyro.getYaw().getValueAsDouble() + RobotConstants.GYRO_OFFSET;
   }
+
+  /**
+   * Sets robot speed to zero.
+   */
+  @Override
+  public void cancel() {
+      drive(0, 0, 0, true);
+  }
 }

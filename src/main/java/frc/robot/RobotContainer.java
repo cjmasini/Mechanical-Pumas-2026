@@ -16,13 +16,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.FaceAprilTagCommand;
 import frc.robot.commands.CancelCommand;
-import frc.robot.commands.BasicLaunchCommand;
-import frc.robot.commands.MoveCommand;
+import frc.robot.commands.drive.FaceAprilTagCommand;
+import frc.robot.commands.drive.MoveCommand;
+import frc.robot.commands.indexer.LoadCommand;
+import frc.robot.commands.indexer.LoadersOnlyCommand;
+import frc.robot.commands.intake.GoToSetpointCommand;
+import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.launch.PowerLaunchCommand;
+import frc.robot.commands.launch.VelocityLaunchCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LaunchSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.LoadSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -37,7 +44,9 @@ public class RobotContainer {
   private final DriveSubsystem driveSubsystem;
   @SuppressWarnings("unused")
   private final VisionSubsystem visionSubsystem;
-  private final LaunchSubsystem exampleSubsystem;
+  private final LaunchSubsystem launchSubsystem;
+  private final LoadSubsystem loadSubsystem;
+  private final IntakeSubsystem intakeSubsystem;
 
   private final CommandXboxController driverXbox = new CommandXboxController(0);
 
@@ -50,7 +59,9 @@ public class RobotContainer {
     // Initialize all subsystems for the robot here
     driveSubsystem = new DriveSubsystem();
     visionSubsystem = new VisionSubsystem(driveSubsystem);
-    exampleSubsystem = new LaunchSubsystem();
+    launchSubsystem = new LaunchSubsystem();
+    loadSubsystem = new LoadSubsystem();
+    intakeSubsystem = new IntakeSubsystem();
 
     // Choosers show up on our dashboard and let us modify options before and during
     // matches
@@ -69,36 +80,31 @@ public class RobotContainer {
    * In this function, we initialize commands and map them to controller buttons
    */
   private void configureBindings() {
-    // Some subsystems have default commands that run when no other command is using
-    // them
-    // Our move command controls how the robot moves around based on controller
-    // input
     MoveCommand moveCommand = new MoveCommand(this.driveSubsystem, this.driverXbox);
     driveSubsystem.setDefaultCommand(moveCommand);
 
-    driverXbox.x().onTrue(
-        driveSubsystem.createDriveToPoseCommand(
-            new Pose2d(2.8, 4.2, Rotation2d.fromDegrees(0.0))));
+    // driverXbox.x().onTrue(
+    //     driveSubsystem.createDriveToPoseCommand(
+    //         new Pose2d(2.8, 4.2, Rotation2d.fromDegrees(0.0))));
 
-    // Initialize example command and set it to run when the A button is pressed
-    BasicLaunchCommand exampleCommand = new BasicLaunchCommand(this.exampleSubsystem);
-    driverXbox.a().and(driverXbox.rightTrigger().negate()).onTrue(exampleCommand);
-    // Adding commands as named commands allows PathPlanner to use them in autos
-    NamedCommands.registerCommand("exampleCommand", exampleCommand);
+    VelocityLaunchCommand launchCommand = new VelocityLaunchCommand(this.launchSubsystem);
+    driverXbox.a().and(driverXbox.rightTrigger().negate()).onTrue(launchCommand);
+    LoadCommand loadCommand = new LoadCommand(this.loadSubsystem);
+    driverXbox.b().onTrue(loadCommand);
 
-    // All subsystems (other than drive) should be passed in to the cancel command
+    GoToSetpointCommand deployIntakeCommand = new GoToSetpointCommand(this.loadSubsystem);
+    driverXbox.y().onTrue(deployIntakeCommand);
+
+    IntakeCommand intakeCommand = new IntakeCommand(this.intakeSubsystem);
+    driverXbox.rightBumper().onTrue(intakeCommand);
+
     CancelCommand cancelCommand = new CancelCommand(
-        List.of(exampleSubsystem));
-    driverXbox.rightTrigger().onTrue(cancelCommand);
+        List.of(launchSubsystem, loadSubsystem, intakeSubsystem, driveSubsystem));
+    driverXbox.leftTrigger().onTrue(cancelCommand);
 
-    // Instant commands are useful for simple one-time actions
-    // Manually re-zero the gyro if robot is misaligned using an instant command
     InstantCommand resetGyro = new InstantCommand(() -> this.driveSubsystem.zeroHeading());
     driverXbox.rightStick().and(driverXbox.leftStick()).onTrue(resetGyro);
 
-    // Bind AutoTarget to Left Trigger
-    // While held, the robot will auto-orient to any visible AprilTag while allowing
-    // driving
     driverXbox.leftTrigger().whileTrue(new FaceAprilTagCommand(driveSubsystem, driverXbox));
   }
 

@@ -32,7 +32,18 @@ public final class Constants {
         public static final int FRONT_LEFT_STEERING_CAN_ID = 8;
 
         // Example Motor CAN Ids
-        public static final int LAUNCHER_ID = 63;
+        public static final int LEFT_LAUNCHER_ID = 41;
+        public static final int RIGHT_LAUNCHER_ID = 42;
+
+        public static final int LEFT_LOADER_ID = 43;
+        public static final int RIGHT_LOADER_ID = 44;
+        public static final int CONVEYOR_MOTOR_ID = 45;
+
+        public static final int LEADER_DEPLOY_ID = 51;
+        public static final int FOLLOWER_DEPLOY_ID = 52;
+        public static final int ROLLER_ID = 53;
+
+
         public static final int PIGEON_GYRO_CAN_ID = 21;
     }
 
