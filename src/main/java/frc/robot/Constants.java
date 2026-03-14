@@ -51,6 +51,10 @@ public final class Constants {
         // Chassis configuration
         public static final double WHEEL_BASE_WIDTH = Units.inchesToMeters(30);
         public static final double WHEEL_BASE_LENGTH = Units.inchesToMeters(24.5);
+
+        public static final double kMaxSpeedMetersPerSecond = 4.8;
+        public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+
         // Distance between centers of right and left or front and back wheels on robot
         public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
                 new Translation2d(WHEEL_BASE_WIDTH / 2, WHEEL_BASE_LENGTH / 2),
@@ -68,7 +72,7 @@ public final class Constants {
         public static final double WHEEL_LOCK_TIME = 10; // seconds
 
         public static final double GYRO_OFFSET = 180;
-
+        public static final boolean kGyroReversed = false;
 
         // Enum for auto-orienting to field directions
         public enum Direction {
@@ -89,6 +93,7 @@ public final class Constants {
 
         public static final double DRIVE_MOTOR_FREE_SPEED_RPM = 6784;
         public static final double WHEEL_CIRCUMFERENCE_IN_METERS = 0.23938936;
+        public static final double WHEEL_RADIUS_IN_METERS = 0.0762;
         // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
         // teeth on the bevel pinion
         public static final double DRIVE_MOTOR_REDUCTION = (45.0 * 22) / (DRIVE_MOTOR_PINION_TEETH * 15);

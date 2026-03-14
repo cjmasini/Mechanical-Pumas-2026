@@ -111,12 +111,37 @@ public class DriveSubsystem extends CancelableSubsystemBase {
     //         backLeftModule.getPosition(),
     //         backRightModule.getPosition()
     //     });
-    
+
     frontLeftModule.getDesiredState();
-    
 
     logPose("Odometry", getPose());
     SmartDashboard.putNumber("gyroOrientation", getGyroOrientation());
+
+    // Fault monitoring for FL and BR modules (the problematic ones)
+    logModuleDiagnostics("FL", frontLeftModule);
+    logModuleDiagnostics("BR", backRightModule);
+  }
+
+  /**
+   * Logs diagnostic information for a swerve module to SmartDashboard.
+   *
+   * @param name   The name prefix for the module (e.g., "FL", "BR")
+   * @param module The swerve module to log diagnostics for
+   */
+  private void logModuleDiagnostics(String name, SwerveModule module) {
+    var faults = module.getDriveFaults();
+    var warnings = module.getDriveWarnings();
+
+    // Log faults and warnings as strings (contains all active fault names)
+    SmartDashboard.putString(name + "_DriveFaults", faults.toString());
+    SmartDashboard.putString(name + "_DriveWarnings", warnings.toString());
+    SmartDashboard.putString(name + "_TurnFaults", module.getTurnFaults().toString());
+
+    // Log motor outputs and encoder data
+    SmartDashboard.putNumber(name + "_DriveAppliedOutput", module.getDriveAppliedOutput());
+    SmartDashboard.putNumber(name + "_DriveCurrent", module.getDriveOutputCurrent());
+    SmartDashboard.putNumber(name + "_TurnAngle", Math.toDegrees(module.getTurnEncoderPosition()));
+    SmartDashboard.putNumber(name + "_DriveVelocity", module.getState().speedMetersPerSecond);
   }
 
   /**

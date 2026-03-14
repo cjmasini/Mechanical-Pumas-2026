@@ -11,10 +11,13 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.Faults;
+import com.revrobotics.spark.SparkBase.Warnings;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -125,6 +128,60 @@ public class SwerveModule {
   }
 
   /**
+   * Gets the faults from the drive motor controller.
+   *
+   * @return The Faults object containing all active faults.
+   */
+  public Faults getDriveFaults() {
+    return this.driveMotorController.getFaults();
+  }
+
+  /**
+   * Gets the warnings from the drive motor controller.
+   *
+   * @return The Warnings object containing all active warnings.
+   */
+  public Warnings getDriveWarnings() {
+    return this.driveMotorController.getWarnings();
+  }
+
+  /**
+   * Gets the faults from the turn motor controller.
+   *
+   * @return The Faults object containing all active faults.
+   */
+  public Faults getTurnFaults() {
+    return this.turnMotorController.getFaults();
+  }
+
+  /**
+   * Gets the applied output of the drive motor (-1 to 1).
+   *
+   * @return The applied output duty cycle.
+   */
+  public double getDriveAppliedOutput() {
+    return this.driveMotorController.getAppliedOutput();
+  }
+
+  /**
+   * Gets the output current of the drive motor in Amps.
+   *
+   * @return The output current.
+   */
+  public double getDriveOutputCurrent() {
+    return this.driveMotorController.getOutputCurrent();
+  }
+
+  /**
+   * Gets the turning encoder position in radians.
+   *
+   * @return The raw turn encoder position.
+   */
+  public double getTurnEncoderPosition() {
+    return this.turnEncoder.getPosition();
+  }
+
+  /**
    * Sets the brake mode for both motors in the swerve module.
    * 
    * @param brake If true, sets motors to brake mode; if false, sets to coast
@@ -157,10 +214,11 @@ public class SwerveModule {
 
     static {
       // Use module constants to calculate conversion factors and feed forward gain.
-      double drivingFactor = ModuleConstants.WHEEL_CIRCUMFERENCE_IN_METERS
+      double drivingFactor = ModuleConstants.WHEEL_RADIUS_IN_METERS * Math.PI
           / ModuleConstants.DRIVE_MOTOR_REDUCTION;
-      double turningFactor = ModuleConstants.MAX_ANGULAR_SPEED;
-      double drivingVelocityFeedForward = 1 / ModuleConstants.DRIVE_WHEEL_FREE_SPEED_IN_MPS;
+      double turningFactor = 2 * Math.PI;
+      double nominalVoltage = 12.0;
+      double drivingVelocityFeedForward = nominalVoltage / ModuleConstants.DRIVE_WHEEL_FREE_SPEED_IN_MPS;
 
       drivingConfig
           .idleMode(IdleMode.kBrake)
@@ -180,13 +238,14 @@ public class SwerveModule {
           .idleMode(IdleMode.kBrake)
           .inverted(false)
           .smartCurrentLimit(20);
-        
+
       turningConfig.absoluteEncoder
           // Invert the turning encoder, since the output shaft rotates in the opposite
           // direction of the steering motor in the MAXSwerve Module.
           .inverted(true)
           .positionConversionFactor(turningFactor) // radians
-          .velocityConversionFactor(turningFactor / 60.0); // radians per second
+          .velocityConversionFactor(turningFactor / 60.0) // radians per second
+          .apply(AbsoluteEncoderConfig.Presets.REV_ThroughBoreEncoderV2);
       turningConfig.closedLoop
           .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
           // These are example gains you may need to them for your own robot!
