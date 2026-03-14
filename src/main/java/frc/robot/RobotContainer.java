@@ -19,10 +19,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.drive.FaceAprilTagCommand;
 import frc.robot.commands.drive.MoveCommand;
+import frc.robot.commands.indexer.TestCommand;
 import frc.robot.commands.indexer.LoadCommand;
 import frc.robot.commands.indexer.LoadersOnlyCommand;
+import frc.robot.commands.indexer.RevLoadCommand;
+import frc.robot.commands.intake.DeployIntakeCommand;
 import frc.robot.commands.intake.GoToSetpointCommand;
 import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.StowIntakeCommand;
 import frc.robot.commands.launch.PowerLaunchCommand;
 import frc.robot.commands.launch.VelocityLaunchCommand;
 import frc.robot.subsystems.DriveSubsystem;
@@ -42,8 +46,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class RobotContainer {
 
   private final DriveSubsystem driveSubsystem;
-  @SuppressWarnings("unused")
-  private final VisionSubsystem visionSubsystem;
+  // private final VisionSubsystem visionSubsystem;
   private final LaunchSubsystem launchSubsystem;
   private final LoadSubsystem loadSubsystem;
   private final IntakeSubsystem intakeSubsystem;
@@ -58,7 +61,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Initialize all subsystems for the robot here
     driveSubsystem = new DriveSubsystem();
-    visionSubsystem = new VisionSubsystem(driveSubsystem);
+    // visionSubsystem = new VisionSubsystem(driveSubsystem);
     launchSubsystem = new LaunchSubsystem();
     loadSubsystem = new LoadSubsystem();
     intakeSubsystem = new IntakeSubsystem();
@@ -87,30 +90,42 @@ public class RobotContainer {
     //     driveSubsystem.createDriveToPoseCommand(
     //         new Pose2d(2.8, 4.2, Rotation2d.fromDegrees(0.0))));
 
-    VelocityLaunchCommand launchCommand = new VelocityLaunchCommand(this.launchSubsystem);
-    driverXbox.a().and(driverXbox.rightTrigger().negate()).onTrue(launchCommand);
+    PowerLaunchCommand launchCommand = new PowerLaunchCommand(this.launchSubsystem);
+    driverXbox.rightBumper().and(driverXbox.rightTrigger().negate()).onTrue(launchCommand);
+    NamedCommands.registerCommand("flywheel", launchCommand);
     LoadCommand loadCommand = new LoadCommand(this.loadSubsystem);
-    driverXbox.b().onTrue(loadCommand);
+    driverXbox.rightTrigger().whileTrue(loadCommand);
+    NamedCommands.registerCommand("load", loadCommand);
+    RevLoadCommand revLoadCommand = new RevLoadCommand(this.loadSubsystem);
+    driverXbox.b().whileTrue(revLoadCommand);
+    NamedCommands.registerCommand("revload", revLoadCommand);
 
-    GoToSetpointCommand deployIntakeCommand = new GoToSetpointCommand(this.loadSubsystem);
-    driverXbox.y().onTrue(deployIntakeCommand);
+    DeployIntakeCommand deployIntakeCommand = new DeployIntakeCommand(this.loadSubsystem);
+    driverXbox.x().onTrue(deployIntakeCommand);
+    NamedCommands.registerCommand("deploy", deployIntakeCommand);
+
+    StowIntakeCommand stowIntakeCommand = new StowIntakeCommand(loadSubsystem);
+    driverXbox.y().onTrue(stowIntakeCommand);
+    NamedCommands.registerCommand("stow", stowIntakeCommand);
 
     IntakeCommand intakeCommand = new IntakeCommand(this.intakeSubsystem);
-    driverXbox.rightBumper().onTrue(intakeCommand);
+    driverXbox.leftTrigger().onTrue(intakeCommand);
+    NamedCommands.registerCommand("intake", intakeCommand);
 
     CancelCommand cancelCommand = new CancelCommand(
-        List.of(launchSubsystem, loadSubsystem, intakeSubsystem, driveSubsystem));
-    driverXbox.leftTrigger().onTrue(cancelCommand);
+        List.of(launchSubsystem, loadSubsystem, intakeSubsystem));
+    driverXbox.leftBumper().onTrue(cancelCommand);
+    NamedCommands.registerCommand("cancel", cancelCommand);
 
     InstantCommand resetGyro = new InstantCommand(() -> this.driveSubsystem.zeroHeading());
     driverXbox.rightStick().and(driverXbox.leftStick()).onTrue(resetGyro);
 
-    driverXbox.leftTrigger().whileTrue(new FaceAprilTagCommand(driveSubsystem, driverXbox));
+    // driverXbox.leftTrigger().whileTrue(new FaceAprilTagCommand(driveSubsystem, driverXbox));
   }
 
   // Return the auto selected on the dashboard
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return new InstantCommand();//autoChooser.getSelected();
   }
 
   public DriveSubsystem getDriveSubsystem() {

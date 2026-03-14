@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -47,7 +48,7 @@ public class IntakeSubsystem extends CancelableSubsystemBase {
         rollerMotor.configure(
                 intakeConfig,
                 ResetMode.kResetSafeParameters,
-                null);
+                PersistMode.kPersistParameters);
     }
 
     /**

@@ -33,14 +33,14 @@ public class ShootAndBuckCommand extends Command {
         movingToStowed = false;
 
         // Start conveyor and loaders at full speed
-        loadSubsystem.setConveyorSpeed(1.0);
+        loadSubsystem.setIndexerSpeed(1.0);
         loadSubsystem.setLoaderSpeed(1.0);
     }
 
     @Override
     public void execute() {
         // Keep conveyor and loaders running at full speed
-        loadSubsystem.setConveyorSpeed(1.0);
+        loadSubsystem.setIndexerSpeed(1.0);
         loadSubsystem.setLoaderSpeed(1.0);
 
         // After delay, also buck the intake

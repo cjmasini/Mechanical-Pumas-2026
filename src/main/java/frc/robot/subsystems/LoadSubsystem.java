@@ -1,12 +1,16 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.thethriftybot.ThriftyNova;
+import com.thethriftybot.ThriftyNova.CurrentType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,18 +18,17 @@ import frc.robot.Constants.CANIdConstants;
 
 /**
  * LoadSubsystem - Controls a loader mechanism using a SparkMax motor controller.
- * 
- */
+ * */
 public class LoadSubsystem extends CancelableSubsystemBase {
 
     // Intake position constants (in motor rotations)
     private static final double STOWED_POSITION = 0.0;
-    private static final double DEPLOYED_POSITION = 10.0; // TODO: Tune this value
-    private static final double BUCK_POSITION = 2.0; // Slightly open for bucking
-    private static final double POSITION_TOLERANCE = 0.5;
+    private static final double DEPLOYED_POSITION = -11.4; // TODO: Tune this value
+    private static final double BUCK_POSITION = -8; // Slightly open for bucking
+    private static final double POSITION_TOLERANCE = 0.2;
 
     // Current monitoring constants
-    private static final double STALL_CURRENT_THRESHOLD = 8.0;
+    private static final double STALL_CURRENT_THRESHOLD = 40.0;
 
     // TODO: Tune these
     private static final double INTAKE_P = 0.05; //Increase if slow
@@ -34,7 +37,7 @@ public class LoadSubsystem extends CancelableSubsystemBase {
 
     private SparkMax leaderDeployMotor;
     private SparkMax followerDeployMotor;
-    private SparkMax conveyorMotor;
+    private SparkFlex indexerMotor;
     private SparkMax leftLoaderMotor;
     private SparkMax rightLoaderMotor;
 
@@ -44,8 +47,7 @@ public class LoadSubsystem extends CancelableSubsystemBase {
 
     /**
      * Initialize the Load Subsystem.
-     * 
-     */
+     * */
     public LoadSubsystem() {
         this.setName("LoadSubsystem");
         prepareLoadMotors();
@@ -74,7 +76,7 @@ public class LoadSubsystem extends CancelableSubsystemBase {
      * @return true if at position or stalled, false if still moving
      */
     public boolean goToSetpoint() {
-        return setIntakePosition(getDashboardSetpoint());
+        return setIntakePosition(-5);
     }
 
     @Override
@@ -83,15 +85,19 @@ public class LoadSubsystem extends CancelableSubsystemBase {
         SmartDashboard.putNumber("Deploy/Position", deployEncoder.getPosition());
         SmartDashboard.putNumber("Deploy/Current", leaderDeployMotor.getOutputCurrent());
         SmartDashboard.putNumber("Deploy/Velocity", deployEncoder.getVelocity());
+        SmartDashboard.putNumber("Loader/RightCurrent", rightLoaderMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Loader/RightOutput", rightLoaderMotor.getAppliedOutput());
+        SmartDashboard.putString("Loader/RightCANError", rightLoaderMotor.getLastError().toString());
+        // SmartDashboard.putNumber("Loader/LeftCurrent", leftLoaderMotor.getStatorCurrent());
 
-        // Read tunable PID values and update if changed
-        double newP = SmartDashboard.getNumber("Deploy/P", INTAKE_P);
-        double newI = SmartDashboard.getNumber("Deploy/I", INTAKE_I);
-        double newD = SmartDashboard.getNumber("Deploy/D", INTAKE_D);
+        // // Read tunable PID values and update if changed
+        // double newP = SmartDashboard.getNumber("Deploy/P", INTAKE_P);
+        // double newI = SmartDashboard.getNumber("Deploy/I", INTAKE_I);
+        // double newD = SmartDashboard.getNumber("Deploy/D", INTAKE_D);
 
-        SparkMaxConfig pidUpdate = new SparkMaxConfig();
-        pidUpdate.closedLoop.p(newP).i(newI).d(newD);
-        leaderDeployMotor.configure(pidUpdate, ResetMode.kNoResetSafeParameters, null);
+        // SparkMaxConfig pidUpdate = new SparkMaxConfig();
+        // pidUpdate.closedLoop.p(newP).i(newI).d(newD);
+        // leaderDeployMotor.configure(pidUpdate, ResetMode.kNoResetSafeParameters, null);
     }
 
         private void prepareLoadMotors() {
@@ -104,21 +110,22 @@ public class LoadSubsystem extends CancelableSubsystemBase {
                 CANIdConstants.FOLLOWER_DEPLOY_ID,
                 MotorType.kBrushless);
 
-        this.conveyorMotor = new SparkMax(
-                CANIdConstants.CONVEYOR_MOTOR_ID,
+        this.indexerMotor = new SparkFlex(
+                CANIdConstants.INDEXER_MOTOR_ID,
                 MotorType.kBrushless);
 
         this.leftLoaderMotor = new SparkMax(
                 CANIdConstants.LEFT_LOADER_ID,
                 MotorType.kBrushless);
 
+        // this.leftLoaderMotor = new ThriftyNova(CANIdConstants.LEFT_LOADER_ID);
         this.rightLoaderMotor = new SparkMax(
                 CANIdConstants.RIGHT_LOADER_ID,
                 MotorType.kBrushless);
 
         SparkMaxConfig leaderDeployConfig = new SparkMaxConfig();
         SparkMaxConfig followerDeployConfig = new SparkMaxConfig();
-        SparkMaxConfig conveyorConfig = new SparkMaxConfig();
+        SparkMaxConfig indexerConfig = new SparkMaxConfig();
         SparkMaxConfig loaderConfig = new SparkMaxConfig();
 
         leaderDeployConfig.idleMode(IdleMode.kBrake);
@@ -132,49 +139,54 @@ public class LoadSubsystem extends CancelableSubsystemBase {
         followerDeployConfig.idleMode(IdleMode.kBrake);
         followerDeployConfig.follow(CANIdConstants.LEADER_DEPLOY_ID, true);
 
-        conveyorConfig.idleMode(IdleMode.kBrake);
-        conveyorConfig.inverted(true);
-        conveyorConfig.smartCurrentLimit(30);
-        conveyorConfig.voltageCompensation(12.0);
+        indexerConfig.idleMode(IdleMode.kBrake);
+        indexerConfig.inverted(false);
+        indexerConfig.smartCurrentLimit(30);
+        indexerConfig.voltageCompensation(12.0);
 
-        loaderConfig.idleMode(IdleMode.kCoast);
+        loaderConfig.idleMode(IdleMode.kBrake);
+        loaderConfig.inverted(false);
         loaderConfig.smartCurrentLimit(40);
         loaderConfig.voltageCompensation(12.0);
 
         leaderDeployMotor.configure(
                 leaderDeployConfig,
                 ResetMode.kResetSafeParameters,
-                null);
+                PersistMode.kNoPersistParameters);
         followerDeployMotor.configure(
                 followerDeployConfig,
                 ResetMode.kResetSafeParameters,
-                null);
-        conveyorMotor.configure(
-                conveyorConfig,
+                PersistMode.kNoPersistParameters);
+        indexerMotor.configure(
+                indexerConfig,
                 ResetMode.kResetSafeParameters,
-                null);
+                PersistMode.kNoPersistParameters);
+
+        rightLoaderMotor.configure(
+                loaderConfig,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kNoPersistParameters);
+
+        // // Nova configuration to match the SparkMax loader settings
+        // leftLoaderMotor(true); // Matches the config change made before the rightLoaderMotor configure call
+        // leftLoaderMotor.setBrakeMode(true);
+        // leftLoaderMotor.setMaxCurrent(CurrentType.STATOR,60);
+        loaderConfig.inverted(true);
         leftLoaderMotor.configure(
                 loaderConfig,
                 ResetMode.kResetSafeParameters,
                 null);
-        rightLoaderMotor.configure(
-                loaderConfig,
-                ResetMode.kResetSafeParameters,
-                null);
-
         this.deployEncoder = leaderDeployMotor.getEncoder();
         this.deployPID = leaderDeployMotor.getClosedLoopController();
     }
 
     /**
      * Set the conveyor motor speed.
-     * 
-     * @param speed
-     *              Speed (-1 to 1) to set the conveyor motor at.
-     * 
-     */
-    public void setConveyorSpeed(double speed) {
-        this.conveyorMotor.set(speed);
+     * * @param speed
+     * Speed (-1 to 1) to set the conveyor motor at.
+     * */
+    public void setIndexerSpeed(double speed) {
+        this.indexerMotor.set(speed);
     }
 
     /**
@@ -229,14 +241,15 @@ public class LoadSubsystem extends CancelableSubsystemBase {
         double error = targetPosition - currentPosition;
 
         if (Math.abs(error) < POSITION_TOLERANCE) {
-            leaderDeployMotor.set(0);
+            // leaderDeployMotor.set(0);
             return true;
         }
 
-        if (leaderDeployMotor.getOutputCurrent() > STALL_CURRENT_THRESHOLD) {
-            leaderDeployMotor.set(0);
-            return true;
-        }
+        // if (leaderDeployMotor.getOutputCurrent() > STALL_CURRENT_THRESHOLD) {
+        //     leaderDeployMotor.set(0);
+        //     SmartDashboard.putBoolean("Stalled", true);
+        //     return true;
+        // }
 
         // Use PID controller to move toward target position
         deployPID.setSetpoint(targetPosition, ControlType.kPosition);
@@ -261,11 +274,11 @@ public class LoadSubsystem extends CancelableSubsystemBase {
      * @return true if rezero is complete, false if still moving
      */
     public boolean rezeroIntake() {
-        if (leaderDeployMotor.getOutputCurrent() > STALL_CURRENT_THRESHOLD) {
-            leaderDeployMotor.set(0);
-            deployEncoder.setPosition(DEPLOYED_POSITION);
-            return true;
-        }
+        // if (leaderDeployMotor.getOutputCurrent() > STALL_CURRENT_THRESHOLD) {
+        //     leaderDeployMotor.set(0);
+        //     deployEncoder.setPosition(DEPLOYED_POSITION);
+        //     return true;
+        // }
 
         leaderDeployMotor.set(0.2);
         return false;
@@ -276,7 +289,7 @@ public class LoadSubsystem extends CancelableSubsystemBase {
      */
     public void cancel() {
         this.leaderDeployMotor.set(0);
-        this.conveyorMotor.set(0);
+        this.indexerMotor.set(0);
         this.leftLoaderMotor.set(0);
         this.rightLoaderMotor.set(0);
     }

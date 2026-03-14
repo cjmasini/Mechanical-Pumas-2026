@@ -1,5 +1,6 @@
 package frc.robot.commands.launch;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LaunchSubsystem;
 
@@ -18,7 +19,9 @@ public class PowerLaunchCommand extends Command {
 
     @Override
     public void initialize() {
-        this.launchSubsystem.setLauncherPower(.55);
+        SmartDashboard.putNumber("launch/power",
+            SmartDashboard.getNumber("launch/power", .55));
+        this.launchSubsystem.setLauncherPower(SmartDashboard.getNumber("launch/power", 0.55));
     }
 
 

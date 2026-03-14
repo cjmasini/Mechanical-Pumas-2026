@@ -37,7 +37,7 @@ public final class Constants {
 
         public static final int LEFT_LOADER_ID = 43;
         public static final int RIGHT_LOADER_ID = 44;
-        public static final int CONVEYOR_MOTOR_ID = 45;
+        public static final int INDEXER_MOTOR_ID = 45;
 
         public static final int LEADER_DEPLOY_ID = 51;
         public static final int FOLLOWER_DEPLOY_ID = 52;
@@ -59,7 +59,7 @@ public final class Constants {
                 new Translation2d(-WHEEL_BASE_WIDTH / 2, -WHEEL_BASE_LENGTH / 2));
 
         // Angular offsets of the modules relative to the chassis in radians
-        public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -Math.PI / 2;
+        public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -Math.PI/2;
         public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0;
         public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.PI;
         public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
@@ -68,6 +68,7 @@ public final class Constants {
         public static final double WHEEL_LOCK_TIME = 10; // seconds
 
         public static final double GYRO_OFFSET = 180;
+
 
         // Enum for auto-orienting to field directions
         public enum Direction {

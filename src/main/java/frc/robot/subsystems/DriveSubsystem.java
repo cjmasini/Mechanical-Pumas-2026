@@ -103,14 +103,17 @@ public class DriveSubsystem extends CancelableSubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    poseEstimator.update(
-        Rotation2d.fromDegrees(getGyroOrientation()),
-        new SwerveModulePosition[] {
-            frontLeftModule.getPosition(),
-            frontRightModule.getPosition(),
-            backLeftModule.getPosition(),
-            backRightModule.getPosition()
-        });
+    // poseEstimator.update(
+    //     Rotation2d.fromDegrees(getGyroOrientation()),
+    //     new SwerveModulePosition[] {
+    //         frontLeftModule.getPosition(),
+    //         frontRightModule.getPosition(),
+    //         backLeftModule.getPosition(),
+    //         backRightModule.getPosition()
+    //     });
+    
+    frontLeftModule.getDesiredState();
+    
 
     logPose("Odometry", getPose());
     SmartDashboard.putNumber("gyroOrientation", getGyroOrientation());
@@ -260,15 +263,14 @@ public class DriveSubsystem extends CancelableSubsystemBase {
    *             The pose to which to set the odometry.
    */
   public void updatePose(Pose2d pose) {
-    poseEstimator.resetPosition(
+    poseEstimator.update(
         Rotation2d.fromDegrees(getGyroOrientation()),
         new SwerveModulePosition[] {
             frontLeftModule.getPosition(),
             frontRightModule.getPosition(),
             backLeftModule.getPosition(),
             backRightModule.getPosition()
-        },
-        pose);
+        });
   }
 
   /**

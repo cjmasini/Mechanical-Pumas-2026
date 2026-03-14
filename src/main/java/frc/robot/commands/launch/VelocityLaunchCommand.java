@@ -12,8 +12,7 @@ public class VelocityLaunchCommand extends Command {
 
     private final LaunchSubsystem launchSubsystem;
     private static final String VELOCITY_KEY = "Launcher/TargetRPM";
-    private static final double DEFAULT_VELOCITY = 5000.0;
-
+    private static final double DEFAULT_VELOCITY = -6500.0;
     /**
      * Creates a new VelocityLaunchCommand.
      *
@@ -43,7 +42,7 @@ public class VelocityLaunchCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return launchSubsystem.isAtTargetVelocity();
+        return false;
     }
 
     @Override

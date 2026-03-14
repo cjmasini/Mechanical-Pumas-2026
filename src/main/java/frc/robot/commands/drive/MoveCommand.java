@@ -77,21 +77,21 @@ public class MoveCommand extends Command {
       double processedRot = -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND);
 
       // If cancel button is pressed, we may be in auto-orient mode
-      boolean orient = driverXbox.rightTrigger().getAsBoolean();
+      // boolean orient = driverXbox.rightTrigger().getAsBoolean();
       Direction targetDirection = null;
-
-      // Choose direction based on face buttons
-      if (orient) {
-        if (driverXbox.x().getAsBoolean()) {
-          targetDirection = Direction.RIGHT;
-        } else if (driverXbox.y().getAsBoolean()) {
-          targetDirection = Direction.BACKWARD;
-        } else if (driverXbox.b().getAsBoolean()) {
-          targetDirection = Direction.LEFT;
-        } else if (driverXbox.a().getAsBoolean()) {
-          targetDirection = Direction.FORWARD;
-        }
-      }
+      boolean orient = false;
+      // // Choose direction based on face buttons
+      // if (orient) {
+      //   if (driverXbox.x().getAsBoolean()) {
+      //     targetDirection = Direction.RIGHT;
+      //   } else if (driverXbox.y().getAsBoolean()) {
+      //     targetDirection = Direction.BACKWARD;
+      //   } else if (driverXbox.b().getAsBoolean()) {
+      //     targetDirection = Direction.LEFT;
+      //   } else if (driverXbox.a().getAsBoolean()) {
+      //     targetDirection = Direction.FORWARD;
+      //   }
+      // }
 
       // If auto-orient is active (cancel button held) and a direction button is pressed
       if (orient && targetDirection != null) {

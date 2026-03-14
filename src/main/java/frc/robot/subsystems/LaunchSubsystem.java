@@ -61,24 +61,6 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
 
     @Override
     public void periodic() {
-        // Publish debug info
-        SmartDashboard.putNumber("Launcher/LeftVelocity", leftLauncherEncoder.getVelocity());
-        SmartDashboard.putNumber("Launcher/RightVelocity", rightLauncherEncoder.getVelocity());
-        SmartDashboard.putNumber("Launcher/AvgVelocity", getLauncherVelocity());
-        SmartDashboard.putNumber("Launcher/TargetVelocity", targetVelocity);
-        SmartDashboard.putNumber("Launcher/LeftCurrent", leftLauncherMotor.getOutputCurrent());
-        SmartDashboard.putNumber("Launcher/RightCurrent", rightLauncherMotor.getOutputCurrent());
-
-        // Read tunable PID values and update if changed
-        double newP = SmartDashboard.getNumber("Launcher/P", DEFAULT_P);
-        double newI = SmartDashboard.getNumber("Launcher/I", DEFAULT_I);
-        double newD = SmartDashboard.getNumber("Launcher/D", DEFAULT_D);
-        double newFF = SmartDashboard.getNumber("Launcher/FF", DEFAULT_FF);
-
-        SparkFlexConfig pidUpdate = new SparkFlexConfig();
-        pidUpdate.closedLoop.pid(newP, newI, newD).feedForward.kV(newFF);
-        leftLauncherMotor.configure(pidUpdate, ResetMode.kNoResetSafeParameters, null);
-        rightLauncherMotor.configure(pidUpdate, ResetMode.kNoResetSafeParameters, null);
     }
 
     /**
@@ -105,8 +87,8 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
         SparkFlexConfig launcherConfig = new SparkFlexConfig();
     
         // We may want to switch to brake mode
-        launcherConfig.idleMode(IdleMode.kCoast);
-        launcherConfig.inverted(true);
+        launcherConfig.idleMode(IdleMode.kBrake);
+        launcherConfig.inverted(false);
 
         launcherConfig.smartCurrentLimit(40);
         launcherConfig.voltageCompensation(12.0);
@@ -115,11 +97,14 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
             .pid(0.0001, 0.0, 0.0)
             .outputRange(-1.0, 1.0)
             .feedForward.kV(0.000175);
+        launcherConfig.inverted(true);
 
         leftLauncherMotor.configure(
                 launcherConfig,
                 ResetMode.kResetSafeParameters,
                 null);
+
+
 
         rightLauncherMotor.configure(
                 launcherConfig,
@@ -165,7 +150,7 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
      */
     public void setLauncherPower(double speed) {
         this.leftLauncherMotor.set(speed);
-        this.leftLauncherMotor.set(speed);
+        this.rightLauncherMotor.set(-speed);
     }
     /**
      * Set the launcher motor to a target velocity

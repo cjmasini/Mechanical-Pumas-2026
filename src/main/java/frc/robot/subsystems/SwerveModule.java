@@ -82,6 +82,9 @@ public class SwerveModule {
         new Rotation2d(this.turnEncoder.getPosition() - chassisAngularOffset));
   }
 
+  public SwerveModuleState getDesiredState(){
+    return this.desiredState;
+  }
   /**
    * Returns the current position of the module.
    *
@@ -137,12 +140,12 @@ public class SwerveModule {
     this.driveMotorController.configure(
         SwerveModuleConfigs.drivingConfig,
         ResetMode.kNoResetSafeParameters,
-        PersistMode.kNoPersistParameters);
+        PersistMode.kPersistParameters);
 
     this.turnMotorController.configure(
         SwerveModuleConfigs.turningConfig,
         ResetMode.kNoResetSafeParameters,
-        PersistMode.kNoPersistParameters);
+        PersistMode.kPersistParameters);
   }
 
   /**
@@ -161,6 +164,7 @@ public class SwerveModule {
 
       drivingConfig
           .idleMode(IdleMode.kBrake)
+          .inverted(false)
           .smartCurrentLimit(50);
       drivingConfig.encoder
           .positionConversionFactor(drivingFactor) // meters
@@ -174,7 +178,9 @@ public class SwerveModule {
 
       turningConfig
           .idleMode(IdleMode.kBrake)
+          .inverted(false)
           .smartCurrentLimit(20);
+        
       turningConfig.absoluteEncoder
           // Invert the turning encoder, since the output shaft rotates in the opposite
           // direction of the steering motor in the MAXSwerve Module.

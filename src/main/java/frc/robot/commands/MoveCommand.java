@@ -93,7 +93,8 @@ public class MoveCommand extends Command {
         }
       }
 
-      // If auto-orient is active (cancel button held) and a direction button is pressed
+      // If auto-orient is active (cancel button held) and a direction button is
+      // pressed
       if (orient && targetDirection != null) {
         this.driveSubsystem.driveAndOrient(processedY, processedX, targetDirection);
 
