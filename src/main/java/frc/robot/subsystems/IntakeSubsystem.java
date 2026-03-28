@@ -3,8 +3,10 @@ package frc.robot.subsystems;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants.CANIdConstants;
@@ -20,7 +22,7 @@ public class IntakeSubsystem extends CancelableSubsystemBase {
      * Intake motor controllers.
      * 
      */
-    private final SparkMax rollerMotor;
+    private final SparkFlex rollerMotor;
 
     /**
      * Initialize the Intake Subsystem.
@@ -29,11 +31,11 @@ public class IntakeSubsystem extends CancelableSubsystemBase {
     public IntakeSubsystem() {
         this.setName("IntakeSubsystem");
 
-        this.rollerMotor = new SparkMax(
+        this.rollerMotor = new SparkFlex(
                 CANIdConstants.ROLLER_ID,
                 MotorType.kBrushless);
 
-        SparkMaxConfig intakeConfig = new SparkMaxConfig();
+        SparkFlexConfig intakeConfig = new SparkFlexConfig();
 
         // We may want to switch to coast mode
         intakeConfig.idleMode(IdleMode.kBrake);

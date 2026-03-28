@@ -23,6 +23,7 @@ import frc.robot.commands.indexer.TestCommand;
 import frc.robot.commands.indexer.LoadCommand;
 import frc.robot.commands.indexer.LoadersOnlyCommand;
 import frc.robot.commands.indexer.RevLoadCommand;
+import frc.robot.commands.indexer.ShootAndBuckCommand;
 import frc.robot.commands.intake.DeployIntakeCommand;
 import frc.robot.commands.intake.GoToSetpointCommand;
 import frc.robot.commands.intake.IntakeCommand;
@@ -33,6 +34,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LaunchSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.LoadSubsystem;
+import frc.robot.subsystems.RevDriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 /**
@@ -45,7 +47,8 @@ import frc.robot.subsystems.IntakeSubsystem;
  */
 public class RobotContainer {
 
-  private final DriveSubsystem driveSubsystem;
+  // private final DriveSubsystem driveSubsystem;
+  private final RevDriveSubsystem driveSubsystem;
   // private final VisionSubsystem visionSubsystem;
   private final LaunchSubsystem launchSubsystem;
   private final LoadSubsystem loadSubsystem;
@@ -53,14 +56,14 @@ public class RobotContainer {
 
   private final CommandXboxController driverXbox = new CommandXboxController(0);
 
-  private final SendableChooser<Command> autoChooser;
+  // private final SendableChooser<Command> autoChooser;
 
   /**
    * The container for the robot. Contains subsystems, IO devices, and commands.
    */
   public RobotContainer() {
     // Initialize all subsystems for the robot here
-    driveSubsystem = new DriveSubsystem();
+    driveSubsystem = new RevDriveSubsystem();
     // visionSubsystem = new VisionSubsystem(driveSubsystem);
     launchSubsystem = new LaunchSubsystem();
     loadSubsystem = new LoadSubsystem();
@@ -68,13 +71,13 @@ public class RobotContainer {
 
     // Choosers show up on our dashboard and let us modify options before and during
     // matches
-    autoChooser = AutoBuilder.buildAutoChooser();
+    // autoChooser = AutoBuilder.buildAutoChooser();
 
     // Setup all controller button mappings
     configureBindings();
 
     // For choosers (or other info) to show up on the dashboard, they must be added
-    SmartDashboard.putData(autoChooser);
+    // SmartDashboard.putData(autoChooser);
   }
 
   /**
@@ -90,7 +93,7 @@ public class RobotContainer {
     //     driveSubsystem.createDriveToPoseCommand(
     //         new Pose2d(2.8, 4.2, Rotation2d.fromDegrees(0.0))));
 
-    PowerLaunchCommand launchCommand = new PowerLaunchCommand(this.launchSubsystem);
+    VelocityLaunchCommand launchCommand = new VelocityLaunchCommand(this.launchSubsystem);
     driverXbox.rightBumper().and(driverXbox.rightTrigger().negate()).onTrue(launchCommand);
     NamedCommands.registerCommand("flywheel", launchCommand);
     LoadCommand loadCommand = new LoadCommand(this.loadSubsystem);
@@ -99,6 +102,8 @@ public class RobotContainer {
     RevLoadCommand revLoadCommand = new RevLoadCommand(this.loadSubsystem);
     driverXbox.b().whileTrue(revLoadCommand);
     NamedCommands.registerCommand("revload", revLoadCommand);
+    ShootAndBuckCommand shootAndBuckCommand = new ShootAndBuckCommand(loadSubsystem);
+    driverXbox.a().onTrue(shootAndBuckCommand);
 
     DeployIntakeCommand deployIntakeCommand = new DeployIntakeCommand(this.loadSubsystem);
     driverXbox.x().onTrue(deployIntakeCommand);
@@ -128,7 +133,8 @@ public class RobotContainer {
     return new InstantCommand();//autoChooser.getSelected();
   }
 
-  public DriveSubsystem getDriveSubsystem() {
+  public RevDriveSubsystem getDriveSubsystem() {
     return driveSubsystem;
   }
+ 
 }

@@ -44,37 +44,37 @@ public class MoveCommand extends Command {
   public void execute() {
     // Trigger mappings for fine-tuned robot-oriented adjustments using the d-pad
     if (driverXbox.povLeft().getAsBoolean()) {
-      driveSubsystem.drive(0, .2, -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
+      driveSubsystem.drive(0, .2, MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
           false);
     } else if (driverXbox.povRight().getAsBoolean()) {
-      driveSubsystem.drive(0, -.2, -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
+      driveSubsystem.drive(0, -.2, MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
           false);
     } else if (driverXbox.povUp().getAsBoolean()) {
-      driveSubsystem.drive(.2, 0, -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
+      driveSubsystem.drive(.2, 0, MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
           false);
     } else if (driverXbox.povDown().getAsBoolean()) {
-      driveSubsystem.drive(-0.2, 0, -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
+      driveSubsystem.drive(-0.2, 0, MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
           false);
     } else if (driverXbox.povUpLeft().getAsBoolean()) {
-      driveSubsystem.drive(.14, .14, -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
+      driveSubsystem.drive(.14, .14, MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
           false);
     } else if (driverXbox.povUpRight().getAsBoolean()) {
-      driveSubsystem.drive(.14, -.14, -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
+      driveSubsystem.drive(.14, -.14, MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
           false);
     } else if (driverXbox.povDownLeft().getAsBoolean()) {
-      driveSubsystem.drive(-.14, .14, -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
+      driveSubsystem.drive(-.14, .14, MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND),
           false);
     } else if (driverXbox.povDownRight().getAsBoolean()) {
       driveSubsystem.drive(-.14, -.14,
-          -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND), false);
+          MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND), false);
     } else { // Joystick / field-oriented based movement
       double yMovement = driverXbox.getLeftY();
       double xMovement = driverXbox.getLeftX();
 
       // Precompute processed joystick values (cubic scaling + deadband)
-      double processedY = -MathUtil.applyDeadband(Math.pow(yMovement, 3), OperatorConstants.DRIVE_DEADBAND);
-      double processedX = -MathUtil.applyDeadband(Math.pow(xMovement, 3), OperatorConstants.DRIVE_DEADBAND);
-      double processedRot = -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND);
+      double processedY = MathUtil.applyDeadband(Math.pow(yMovement, 3), OperatorConstants.DRIVE_DEADBAND);
+      double processedX = MathUtil.applyDeadband(Math.pow(xMovement, 3), OperatorConstants.DRIVE_DEADBAND);
+      double processedRot = MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.DRIVE_DEADBAND);
 
       // If cancel button is pressed, we may be in auto-orient mode
       boolean orient = driverXbox.rightTrigger().getAsBoolean();

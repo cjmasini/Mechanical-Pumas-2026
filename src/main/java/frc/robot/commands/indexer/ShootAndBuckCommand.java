@@ -12,7 +12,7 @@ import frc.robot.subsystems.LoadSubsystem;
 public class ShootAndBuckCommand extends Command {
 
     private final LoadSubsystem loadSubsystem;
-    private final double BUCK_DELAY_TIME = 3.0;
+    private final double BUCK_DELAY_TIME = 1.0;
     private double startTime;
     private boolean movingToStowed;
 

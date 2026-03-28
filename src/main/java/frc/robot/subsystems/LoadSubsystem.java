@@ -24,7 +24,7 @@ public class LoadSubsystem extends CancelableSubsystemBase {
     // Intake position constants (in motor rotations)
     private static final double STOWED_POSITION = 0.0;
     private static final double DEPLOYED_POSITION = -11.4; // TODO: Tune this value
-    private static final double BUCK_POSITION = -8; // Slightly open for bucking
+    private static final double BUCK_POSITION = -1; // Slightly open for bucking
     private static final double POSITION_TOLERANCE = 0.2;
 
     // Current monitoring constants

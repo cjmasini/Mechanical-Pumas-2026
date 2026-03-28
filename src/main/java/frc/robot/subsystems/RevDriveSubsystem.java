@@ -23,22 +23,22 @@ import frc.robot.utils.SwerveUtils;
 
 public class RevDriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
-  private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
+  private final SwerveModule m_frontLeft = new SwerveModule(
     CANIdConstants.FRONT_LEFT_DRIVE_CAN_ID,
     CANIdConstants.FRONT_LEFT_STEERING_CAN_ID,
     RobotConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
 
-  private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
+  private final SwerveModule m_frontRight = new SwerveModule(
       CANIdConstants.FRONT_RIGHT_DRIVE_CAN_ID,
       CANIdConstants.FRONT_RIGHT_STEERING_CAN_ID,
       RobotConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
-  private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
+  private final SwerveModule m_rearLeft = new SwerveModule(
       CANIdConstants.BACK_LEFT_DRIVE_CAN_ID,
       CANIdConstants.BACK_LEFT_STEERING_CAN_ID,
       RobotConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
 
-  private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
+  private final SwerveModule m_rearRight = new SwerveModule(
       CANIdConstants.BACK_RIGHT_DRIVE_CAN_ID,
       CANIdConstants.BACK_RIGHT_STEERING_CAN_ID,
       RobotConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
@@ -78,6 +78,10 @@ public class RevDriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+     // m_frontLeft.resetMotorControllers();
+     // m_frontRight.resetMotorControllers();
+     // m_rearLeft.resetMotorControllers();
+     // m_rearRight.resetMotorControllers();
   }
 
   /**

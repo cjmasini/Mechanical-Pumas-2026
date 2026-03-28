@@ -22,6 +22,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.PersistMode;
+import com.revrobotics.REVLibError;
 import com.revrobotics.ResetMode;
 
 
@@ -199,10 +200,14 @@ public class SwerveModule {
         ResetMode.kNoResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    this.turnMotorController.configure(
+    REVLibError test = this.turnMotorController.configure(
         SwerveModuleConfigs.turningConfig,
         ResetMode.kNoResetSafeParameters,
         PersistMode.kPersistParameters);
+
+        System.out.println("HELLOW WORD");
+        System.out.println(test);
+
   }
 
   /**
@@ -258,5 +263,10 @@ public class SwerveModule {
           .positionWrappingEnabled(true)
           .positionWrappingInputRange(0, turningFactor);
     }
+  }
+
+  public void resetMotorControllers(){
+    driveMotorController.configure(SwerveModuleConfigs.drivingConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    turnMotorController.configure(SwerveModuleConfigs.turningConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 }

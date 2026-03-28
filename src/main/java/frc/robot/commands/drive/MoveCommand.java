@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.RobotConstants.Direction;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.RevDriveSubsystem;
 
 /**
  * Command for moving the robot using the swerve drive modules and an x-box
@@ -13,7 +14,7 @@ import frc.robot.subsystems.DriveSubsystem;
  */
 public class MoveCommand extends Command {
   private final CommandXboxController driverXbox;
-  private final DriveSubsystem driveSubsystem;
+  private final RevDriveSubsystem driveSubsystem;
   private boolean fieldRelative = true;
 
   /**
@@ -34,7 +35,7 @@ public class MoveCommand extends Command {
    * @param driverXbox
    *                   The xbox controller for the robot
    */
-  public MoveCommand(DriveSubsystem drivetrain, CommandXboxController driverXbox) {
+  public MoveCommand(RevDriveSubsystem drivetrain, CommandXboxController driverXbox) {
     this.driveSubsystem = drivetrain;
     this.driverXbox = driverXbox;
     addRequirements(this.driveSubsystem);
@@ -94,17 +95,17 @@ public class MoveCommand extends Command {
       // }
 
       // If auto-orient is active (cancel button held) and a direction button is pressed
-      if (orient && targetDirection != null) {
-        this.driveSubsystem.driveAndOrient(processedY, processedX, targetDirection);
+      // if (orient && targetDirection != null) {
+      //   this.driveSubsystem.driveAndOrient(processedY, processedX, targetDirection);
 
-      } else {
+      // } else {
         // Default joystick-controlled swerve
         this.driveSubsystem.drive(
             processedY,
             processedX,
             processedRot,
             fieldRelative);
-      }
+      // }
 
     }
   }

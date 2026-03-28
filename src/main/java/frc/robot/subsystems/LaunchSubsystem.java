@@ -49,7 +49,6 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
     public LaunchSubsystem() {
         this.setName("LaunchSubsystem");
         prepareLaunchMotors();
-        initSmartDashboard();
     }
 
     private void initSmartDashboard() {
@@ -61,6 +60,9 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("launch/leftVelocity", leftLauncherEncoder.getVelocity());
+                SmartDashboard.putNumber("launch/rightVelocity", rightLauncherEncoder.getVelocity());
+
     }
 
     /**
@@ -88,15 +90,15 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
     
         // We may want to switch to brake mode
         launcherConfig.idleMode(IdleMode.kBrake);
-        launcherConfig.inverted(false);
+        launcherConfig.inverted(true);
 
         launcherConfig.smartCurrentLimit(40);
         launcherConfig.voltageCompensation(12.0);
     
         launcherConfig.closedLoop
-            .pid(0.0001, 0.0, 0.0)
+            .pid(0.0005, 0.0, 0.00005 )
             .outputRange(-1.0, 1.0)
-            .feedForward.kV(0.000175);
+            .feedForward.kV(0.0018);
         launcherConfig.inverted(true);
 
         leftLauncherMotor.configure(
@@ -122,12 +124,7 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
 
 
     private void createDistanceMap() {
-        addCalibrationPoint(1.0, 2000.0);
-        addCalibrationPoint(2.0, 2500.0);
-        addCalibrationPoint(3.0, 3000.0);
-        addCalibrationPoint(4.0, 3500.0);
-        addCalibrationPoint(5.0, 4000.0);
-        addCalibrationPoint(6.0, 4500.0);
+        addCalibrationPoint(1.0, 750.0);
     }
 
     /**
@@ -150,7 +147,7 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
      */
     public void setLauncherPower(double speed) {
         this.leftLauncherMotor.set(speed);
-        this.rightLauncherMotor.set(-speed);
+        this.rightLauncherMotor.set(speed);
     }
     /**
      * Set the launcher motor to a target velocity
@@ -159,8 +156,9 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
      */
     public void setLauncherVelocity(double rpm) {
         this.targetVelocity = rpm;
+        SmartDashboard.putNumber("launch/commandedRPM", rpm);
         leftClosedLoopController.setSetpoint(rpm, ControlType.kVelocity);
-        rightClosedLoopController.setSetpoint(rpm, ControlType.kVelocity);
+        rightClosedLoopController.setSetpoint(-rpm, ControlType.kVelocity);
     }
 
     /**
@@ -208,7 +206,7 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
      * @return true if at target velocity
      */
     public boolean isAtTargetVelocity() {
-        return isAtTargetVelocity(100.0);
+        return isAtTargetVelocity(100);
     }
 
     /**
