@@ -3,7 +3,7 @@ package frc.robot.commands.drive;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.RobotConstants.Direction;
+// import frc.robot.Constants.RobotConstants.Direction;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -78,8 +78,8 @@ public class MoveCommand extends Command {
 
       // If cancel button is pressed, we may be in auto-orient mode
       // boolean orient = driverXbox.rightTrigger().getAsBoolean();
-      Direction targetDirection = null;
-      boolean orient = false;
+      // Direction targetDirection = null;
+      // boolean orient = false;
       // // Choose direction based on face buttons
       // if (orient) {
       //   if (driverXbox.x().getAsBoolean()) {
