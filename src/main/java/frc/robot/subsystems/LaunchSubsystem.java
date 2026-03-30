@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -10,6 +11,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CANIdConstants;
 
@@ -33,13 +35,9 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
     /** Minimum calibrated distance in meters */
     private double minDistance = Double.MAX_VALUE;
     /** Maximum calibrated distance in meters */
-    private double maxDistance = Double.MIN_VALUE;
+    private double maxDistance = -Double.MAX_VALUE;
 
-    // Default PID/FF values for tuning
-    private static final double DEFAULT_P = 0.0001;
-    private static final double DEFAULT_I = 0.0;
-    private static final double DEFAULT_D = 0.0;
-    private static final double DEFAULT_FF = 0.000175;
+    private final double LAUNCHER_VELOCITY_TOLERANCE = 20;
 
     private double targetVelocity = 0.0;
 
@@ -51,30 +49,11 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
         prepareLaunchMotors();
     }
 
-    private void initSmartDashboard() {
-        SmartDashboard.putNumber("Launcher/P", DEFAULT_P);
-        SmartDashboard.putNumber("Launcher/I", DEFAULT_I);
-        SmartDashboard.putNumber("Launcher/D", DEFAULT_D);
-        SmartDashboard.putNumber("Launcher/FF", DEFAULT_FF);
-    }
-
     @Override
     public void periodic() {
         SmartDashboard.putNumber("launch/leftVelocity", leftLauncherEncoder.getVelocity());
                 SmartDashboard.putNumber("launch/rightVelocity", rightLauncherEncoder.getVelocity());
 
-    }
-
-    /**
-     * Set the speed for all motors.
-     * 
-     * @param speed
-     *              Speed (-1 to 1) to set the motors at.
-     * 
-     */
-    public void setLauncherSpeed(double speed) {
-        this.leftLauncherMotor.set(speed);
-        this.rightLauncherMotor.set(speed);
     }
 
     private void prepareLaunchMotors() {
@@ -88,9 +67,7 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
 
         SparkFlexConfig launcherConfig = new SparkFlexConfig();
     
-        // We may want to switch to brake mode
         launcherConfig.idleMode(IdleMode.kBrake);
-        launcherConfig.inverted(true);
 
         launcherConfig.smartCurrentLimit(40);
         launcherConfig.voltageCompensation(12.0);
@@ -99,19 +76,19 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
             .pid(0.0005, 0.0, 0.00005 )
             .outputRange(-1.0, 1.0)
             .feedForward.kV(0.0018);
-        launcherConfig.inverted(true);
+        launcherConfig.inverted(false);
 
         leftLauncherMotor.configure(
                 launcherConfig,
                 ResetMode.kResetSafeParameters,
-                null);
+                PersistMode.kNoPersistParameters);
 
 
 
         rightLauncherMotor.configure(
                 launcherConfig,
                 ResetMode.kResetSafeParameters,
-                null);
+                PersistMode.kNoPersistParameters);
     
     
         this.leftClosedLoopController = leftLauncherMotor.getClosedLoopController();
@@ -124,7 +101,22 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
 
 
     private void createDistanceMap() {
-        addCalibrationPoint(1.0, 750.0);
+        addCalibrationPoint(Units.inchesToMeters(41), 2900);
+        addCalibrationPoint(Units.inchesToMeters(53), 2950);
+        addCalibrationPoint(Units.inchesToMeters(66), 3000);
+        addCalibrationPoint(Units.inchesToMeters(67.5), 3050);
+        addCalibrationPoint(Units.inchesToMeters(68), 3100);
+        addCalibrationPoint(Units.inchesToMeters(74), 3200);
+        addCalibrationPoint(Units.inchesToMeters(80), 3250);
+        addCalibrationPoint(Units.inchesToMeters(83), 3300);
+        addCalibrationPoint(Units.inchesToMeters(90), 3350);
+        addCalibrationPoint(Units.inchesToMeters(95), 3400);
+        addCalibrationPoint(Units.inchesToMeters(99), 3450);
+        addCalibrationPoint(Units.inchesToMeters(103), 3500);
+        addCalibrationPoint(Units.inchesToMeters(106), 3550);
+        addCalibrationPoint(Units.inchesToMeters(112), 3600);
+        addCalibrationPoint(Units.inchesToMeters(119), 3650);
+
     }
 
     /**
@@ -143,11 +135,11 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
     /**
      * Set the launcher motor speed 
      *
-     * @param speed Speed (-1 to 1) to set the launcher motor at.
+     * @param power Speed (-1 to 1) to set the launcher motor at.
      */
-    public void setLauncherPower(double speed) {
-        this.leftLauncherMotor.set(speed);
-        this.rightLauncherMotor.set(speed);
+    public void setLauncherPower(double power) {
+        this.leftLauncherMotor.set(power);
+        this.rightLauncherMotor.set(-power);
     }
     /**
      * Set the launcher motor to a target velocity
@@ -178,7 +170,7 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
      * @return Current velocity in RPM (average of both motors)
      */
     public double getLauncherVelocity() {
-        return (leftLauncherEncoder.getVelocity() + rightLauncherEncoder.getVelocity()) / 2.0;
+        return (Math.abs(leftLauncherEncoder.getVelocity()) + Math.abs(rightLauncherEncoder.getVelocity())) / 2.0;
     }
 
     /**
@@ -196,19 +188,10 @@ public class LaunchSubsystem extends CancelableSubsystemBase {
      * @param toleranceRPM Acceptable error in RPM
      * @return true if at target velocity
      */
-    public boolean isAtTargetVelocity(double toleranceRPM) {
-        return Math.abs(getLauncherVelocity() - targetVelocity) < toleranceRPM;
-    }
-
-    /**
-     * Checks if the launcher is at the target velocity with default 100 RPM tolerance.
-     *
-     * @return true if at target velocity
-     */
     public boolean isAtTargetVelocity() {
-        return isAtTargetVelocity(100);
+        return Math.abs(getLauncherVelocity() - targetVelocity) < LAUNCHER_VELOCITY_TOLERANCE;
     }
-
+    
     /**
      * Gets the minimum calibrated distance.
      *

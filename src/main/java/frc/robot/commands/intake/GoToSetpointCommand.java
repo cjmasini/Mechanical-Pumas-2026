@@ -1,7 +1,7 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.LoadSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 /**
  * Command that moves the deploy mechanism to the SmartDashboard setpoint.
@@ -9,11 +9,11 @@ import frc.robot.subsystems.LoadSubsystem;
  */
 public class GoToSetpointCommand extends Command {
 
-    private final LoadSubsystem loadSubsystem;
+    private final IntakeSubsystem intakeSubsystem;
 
-    public GoToSetpointCommand(LoadSubsystem loadSubsystem) {
-        this.loadSubsystem = loadSubsystem;
-        addRequirements(loadSubsystem);
+    public GoToSetpointCommand(IntakeSubsystem intakeSubsystem) {
+        this.intakeSubsystem = intakeSubsystem;
+        addRequirements(intakeSubsystem);
     }
 
     @Override
@@ -26,11 +26,11 @@ public class GoToSetpointCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return loadSubsystem.goToSetpoint();
+        return intakeSubsystem.goToSetpoint();
     }
 
     @Override
     public void end(boolean interrupted) {
-        loadSubsystem.cancel();
+        intakeSubsystem.cancel();
     }
 }

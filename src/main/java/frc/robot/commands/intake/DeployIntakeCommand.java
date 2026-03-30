@@ -1,18 +1,18 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.LoadSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 /**
  * Command to deploy the intake.
  */
 public class DeployIntakeCommand extends Command {
 
-    private final LoadSubsystem loadSubsystem;
+    private final IntakeSubsystem intakeSubsystem;
 
-    public DeployIntakeCommand(LoadSubsystem loadSubsystem) {
-        this.loadSubsystem = loadSubsystem;
-        addRequirements(loadSubsystem);
+    public DeployIntakeCommand(IntakeSubsystem intakeSubsystem) {
+        this.intakeSubsystem = intakeSubsystem;
+        addRequirements(intakeSubsystem);
     }
 
     @Override
@@ -21,15 +21,16 @@ public class DeployIntakeCommand extends Command {
 
     @Override
     public void execute() {
+        intakeSubsystem.deployIntake();
     }
 
     @Override
     public boolean isFinished() {
-        return loadSubsystem.deployIntake();
+        return intakeSubsystem.deployIntake();
     }
 
     @Override
     public void end(boolean interrupted) {
-        loadSubsystem.cancel();
+        intakeSubsystem.cancel();
     }
 }

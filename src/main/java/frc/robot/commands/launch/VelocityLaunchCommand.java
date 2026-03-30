@@ -12,7 +12,7 @@ public class VelocityLaunchCommand extends Command {
 
     private final LaunchSubsystem launchSubsystem;
     private static final String VELOCITY_KEY = "Launcher/TargetRPM";
-    private static final double DEFAULT_VELOCITY = -3250.0;
+    private static final double DEFAULT_VELOCITY = 3250.0;
     /**
      * Creates a new VelocityLaunchCommand.
      *

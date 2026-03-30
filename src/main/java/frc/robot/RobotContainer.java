@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.AutoTargetHubCommand;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.drive.FaceAprilTagCommand;
 import frc.robot.commands.drive.MoveCommand;
@@ -23,7 +24,7 @@ import frc.robot.commands.indexer.TestCommand;
 import frc.robot.commands.indexer.LoadCommand;
 import frc.robot.commands.indexer.LoadersOnlyCommand;
 import frc.robot.commands.indexer.RevLoadCommand;
-import frc.robot.commands.indexer.ShootAndBuckCommand;
+import frc.robot.commands.intake.BuckCommand;
 import frc.robot.commands.intake.DeployIntakeCommand;
 import frc.robot.commands.intake.GoToSetpointCommand;
 import frc.robot.commands.intake.IntakeCommand;
@@ -34,7 +35,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LaunchSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.LoadSubsystem;
-import frc.robot.subsystems.RevDriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 /**
@@ -47,9 +47,8 @@ import frc.robot.subsystems.IntakeSubsystem;
  */
 public class RobotContainer {
 
-  // private final DriveSubsystem driveSubsystem;
-  private final RevDriveSubsystem driveSubsystem;
-  // private final VisionSubsystem visionSubsystem;
+  private final DriveSubsystem driveSubsystem;
+  private final VisionSubsystem visionSubsystem;
   private final LaunchSubsystem launchSubsystem;
   private final LoadSubsystem loadSubsystem;
   private final IntakeSubsystem intakeSubsystem;
@@ -63,11 +62,11 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Initialize all subsystems for the robot here
-    driveSubsystem = new RevDriveSubsystem();
-    // visionSubsystem = new VisionSubsystem(driveSubsystem);
+    driveSubsystem = new DriveSubsystem();
     launchSubsystem = new LaunchSubsystem();
     loadSubsystem = new LoadSubsystem();
     intakeSubsystem = new IntakeSubsystem();
+    visionSubsystem = new VisionSubsystem(driveSubsystem);
 
     // Choosers show up on our dashboard and let us modify options before and during
     // matches
@@ -97,19 +96,22 @@ public class RobotContainer {
     driverXbox.rightBumper().and(driverXbox.rightTrigger().negate()).onTrue(launchCommand);
     NamedCommands.registerCommand("flywheel", launchCommand);
     LoadCommand loadCommand = new LoadCommand(this.loadSubsystem);
-    driverXbox.rightTrigger().whileTrue(loadCommand);
+    driverXbox.rightTrigger().onTrue(loadCommand);
     NamedCommands.registerCommand("load", loadCommand);
     RevLoadCommand revLoadCommand = new RevLoadCommand(this.loadSubsystem);
     driverXbox.b().whileTrue(revLoadCommand);
     NamedCommands.registerCommand("revload", revLoadCommand);
-    ShootAndBuckCommand shootAndBuckCommand = new ShootAndBuckCommand(loadSubsystem);
-    driverXbox.a().onTrue(shootAndBuckCommand);
+    BuckCommand buckCommand = new BuckCommand(intakeSubsystem);
+    driverXbox.a().onTrue(buckCommand);
 
-    DeployIntakeCommand deployIntakeCommand = new DeployIntakeCommand(this.loadSubsystem);
+    AutoTargetHubCommand autoTargetHubCommand = new AutoTargetHubCommand(driveSubsystem, visionSubsystem, driverXbox);
+    driverXbox.start().whileTrue(autoTargetHubCommand);
+
+    DeployIntakeCommand deployIntakeCommand = new DeployIntakeCommand(this.intakeSubsystem);
     driverXbox.x().onTrue(deployIntakeCommand);
     NamedCommands.registerCommand("deploy", deployIntakeCommand);
 
-    StowIntakeCommand stowIntakeCommand = new StowIntakeCommand(loadSubsystem);
+    StowIntakeCommand stowIntakeCommand = new StowIntakeCommand(intakeSubsystem);
     driverXbox.y().onTrue(stowIntakeCommand);
     NamedCommands.registerCommand("stow", stowIntakeCommand);
 
@@ -124,8 +126,6 @@ public class RobotContainer {
 
     InstantCommand resetGyro = new InstantCommand(() -> this.driveSubsystem.zeroHeading());
     driverXbox.rightStick().and(driverXbox.leftStick()).onTrue(resetGyro);
-
-    // driverXbox.leftTrigger().whileTrue(new FaceAprilTagCommand(driveSubsystem, driverXbox));
   }
 
   // Return the auto selected on the dashboard
@@ -133,7 +133,7 @@ public class RobotContainer {
     return new InstantCommand();//autoChooser.getSelected();
   }
 
-  public RevDriveSubsystem getDriveSubsystem() {
+  public DriveSubsystem getDriveSubsystem() {
     return driveSubsystem;
   }
  

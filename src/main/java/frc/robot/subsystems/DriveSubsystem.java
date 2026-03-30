@@ -103,16 +103,14 @@ public class DriveSubsystem extends CancelableSubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    // poseEstimator.update(
-    //     Rotation2d.fromDegrees(getGyroOrientation()),
-    //     new SwerveModulePosition[] {
-    //         frontLeftModule.getPosition(),
-    //         frontRightModule.getPosition(),
-    //         backLeftModule.getPosition(),
-    //         backRightModule.getPosition()
-    //     });
-
-    frontLeftModule.getDesiredState();
+    poseEstimator.update(
+        Rotation2d.fromDegrees(getGyroOrientation()),
+        new SwerveModulePosition[] {
+            frontLeftModule.getPosition(),
+            frontRightModule.getPosition(),
+            backLeftModule.getPosition(),
+            backRightModule.getPosition()
+        });
 
     logPose("Odometry", getPose());
     SmartDashboard.putNumber("gyroOrientation", getGyroOrientation());
@@ -182,9 +180,9 @@ public class DriveSubsystem extends CancelableSubsystemBase {
    * @param rot    Manual angular rate (used if no target is found).
    */
   public void driveWhileTargeting(double xSpeed, double ySpeed, double rot) {
-    boolean hasTarget = LimelightHelpers.getTV(VisionConstants.FRONT_RIGHT_CAMERA_NAME);
+    boolean hasTarget = LimelightHelpers.getTV(VisionConstants.LIMELIGHT_NAME);
     if (hasTarget) {
-      double tx = LimelightHelpers.getTX(VisionConstants.FRONT_RIGHT_CAMERA_NAME);
+      double tx = LimelightHelpers.getTX(VisionConstants.LIMELIGHT_NAME);
       double targetHeading = getHeading() - tx;
       driveAndOrient(xSpeed, ySpeed, targetHeading, true);
     } else {
@@ -288,14 +286,15 @@ public class DriveSubsystem extends CancelableSubsystemBase {
    *             The pose to which to set the odometry.
    */
   public void updatePose(Pose2d pose) {
-    poseEstimator.update(
+    poseEstimator.resetPosition(
         Rotation2d.fromDegrees(getGyroOrientation()),
         new SwerveModulePosition[] {
             frontLeftModule.getPosition(),
             frontRightModule.getPosition(),
             backLeftModule.getPosition(),
             backRightModule.getPosition()
-        });
+        },
+        pose);
   }
 
   /**

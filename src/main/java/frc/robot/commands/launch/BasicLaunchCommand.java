@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.launch;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LaunchSubsystem;
@@ -21,7 +21,7 @@ public class BasicLaunchCommand extends Command {
 
     @Override
     public void initialize() {
-        this.launchSubsystem.setLauncherSpeed(.55);
+        this.launchSubsystem.setLauncherPower(.55);
     }
 
 

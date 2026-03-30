@@ -41,7 +41,7 @@ public class VisionSubsystem extends SubsystemBase {
         this.driveSubsystem = driveSubsystem;
 
         this.cameras = new VisionCamera[] {
-                new LimelightCamera(VisionConstants.FRONT_RIGHT_CAMERA_NAME,
+                new LimelightCamera(VisionConstants.LIMELIGHT_NAME,
                         VisionConstants.FRONT_RIGHT_LIMELIGHT_TRANSFORM)
         };
     }

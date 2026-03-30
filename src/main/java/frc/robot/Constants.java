@@ -139,7 +139,7 @@ public final class Constants {
         public static final AprilTagFieldLayout APRIL_TAG_LAYOUT = AprilTagFieldLayout
                 .loadField(AprilTagFields.kDefaultField);
 
-        public static final String FRONT_RIGHT_CAMERA_NAME = "limelight";
+        public static final String LIMELIGHT_NAME = "limelight";
 
         // +X = forward, +Y = left, +Z = up (meters from robot center)
         private static final Translation3d FRONT_RIGHT_CAMERA_TRANSLATION = new Translation3d(

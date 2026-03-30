@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.RobotConstants.Direction;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.RevDriveSubsystem;
 
 /**
  * Command for moving the robot using the swerve drive modules and an x-box
@@ -14,7 +13,7 @@ import frc.robot.subsystems.RevDriveSubsystem;
  */
 public class MoveCommand extends Command {
   private final CommandXboxController driverXbox;
-  private final RevDriveSubsystem driveSubsystem;
+  private final DriveSubsystem driveSubsystem;
   private boolean fieldRelative = true;
 
   /**
@@ -35,7 +34,7 @@ public class MoveCommand extends Command {
    * @param driverXbox
    *                   The xbox controller for the robot
    */
-  public MoveCommand(RevDriveSubsystem drivetrain, CommandXboxController driverXbox) {
+  public MoveCommand(DriveSubsystem drivetrain, CommandXboxController driverXbox) {
     this.driveSubsystem = drivetrain;
     this.driverXbox = driverXbox;
     addRequirements(this.driveSubsystem);

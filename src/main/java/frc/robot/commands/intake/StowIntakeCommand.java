@@ -1,18 +1,18 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.LoadSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 
 /**
  * Command to stow the intake.
  */
 public class StowIntakeCommand extends Command {
 
-    private final LoadSubsystem loadSubsystem;
+    private final IntakeSubsystem intakeSubsystem;
 
-    public StowIntakeCommand(LoadSubsystem loadSubsystem) {
-        this.loadSubsystem = loadSubsystem;
-        addRequirements(loadSubsystem);
+    public StowIntakeCommand(IntakeSubsystem intakeSubsystem) {
+        this.intakeSubsystem = intakeSubsystem;
+        addRequirements(intakeSubsystem);
     }
 
     @Override
@@ -21,15 +21,16 @@ public class StowIntakeCommand extends Command {
 
     @Override
     public void execute() {
+        intakeSubsystem.stowIntake();
     }
 
     @Override
     public boolean isFinished() {
-        return loadSubsystem.stowIntake();
+        return intakeSubsystem.stowIntake();
     }
 
     @Override
     public void end(boolean interrupted) {
-        loadSubsystem.cancel();
+        intakeSubsystem.cancel();
     }
 }

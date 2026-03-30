@@ -65,9 +65,9 @@ public class SwerveModule {
     // applying the configuration to bring the SPARK to a known good state. Persist
     // the settings to the SPARK to avoid losing them on a power cycle.
     this.driveMotorController.configure(SwerveModuleConfigs.drivingConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+        PersistMode.kNoPersistParameters);
     this.turnMotorController.configure(SwerveModuleConfigs.turningConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+        PersistMode.kNoPersistParameters);
 
     this.chassisAngularOffset = chassisAngularOffset;
     this.desiredState.angle = new Rotation2d(turnEncoder.getPosition());
@@ -197,17 +197,13 @@ public class SwerveModule {
     // Reconfigure both motors without resetting other parameters
     this.driveMotorController.configure(
         SwerveModuleConfigs.drivingConfig,
-        ResetMode.kNoResetSafeParameters,
-        PersistMode.kPersistParameters);
+        ResetMode.kResetSafeParameters,
+        PersistMode.kNoPersistParameters);
 
-    REVLibError test = this.turnMotorController.configure(
+    this.turnMotorController.configure(
         SwerveModuleConfigs.turningConfig,
-        ResetMode.kNoResetSafeParameters,
-        PersistMode.kPersistParameters);
-
-        System.out.println("HELLOW WORD");
-        System.out.println(test);
-
+        ResetMode.kResetSafeParameters,
+        PersistMode.kNoPersistParameters);
   }
 
   /**
