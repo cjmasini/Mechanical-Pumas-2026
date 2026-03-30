@@ -29,7 +29,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     // Track when we last had a valid vision measurement
     private double lastVisionTimestamp = 0.0;
-    private static final double VISION_STALE_THRESHOLD_SECONDS = 1.0;
+    private static final double VISION_STALE_THRESHOLD_SECONDS = 0.5;
 
     /**
      * Constructs a VisionSubsystem that manages all vision cameras.
@@ -188,6 +188,24 @@ public class VisionSubsystem extends SubsystemBase {
      */
     public boolean hasRecentVision() {
         return getSecondsSinceLastVision() < VISION_STALE_THRESHOLD_SECONDS;
+    }
+
+    /**
+     * Polls all cameras once and resets the robot pose from the best available
+     * vision measurement. Call this at the start of autonomous to seed the
+     * estimator before path following begins.
+     */
+    public void seedPoseFromVision() {
+        for (VisionCamera camera : cameras) {
+            Optional<VisionMeasurement> measurement = camera.getEstimatedGlobalPose();
+            if (measurement.isEmpty()) continue;
+            VisionMeasurement m = measurement.get();
+            double measurementAge = Timer.getFPGATimestamp() - m.timestampSeconds;
+            if (measurementAge > VISION_STALE_THRESHOLD_SECONDS) continue;
+            driveSubsystem.updatePose(m.pose);
+            lastVisionTimestamp = Timer.getFPGATimestamp();
+            return;
+        }
     }
 
     /**

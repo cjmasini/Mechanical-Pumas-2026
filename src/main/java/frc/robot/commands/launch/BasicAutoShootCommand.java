@@ -33,7 +33,7 @@ public class BasicAutoShootCommand extends SequentialCommandGroup {
                     new LoadCommand(loadSubsystem),
                     new WaitCommand(3),
                     // Start bucking after 3 seconds
-                    new BuckCommand(intakeSubsystem).withTimeout(3)
+                    new BuckCommand(intakeSubsystem)
                 )
             )
         );

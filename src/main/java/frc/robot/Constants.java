@@ -143,15 +143,15 @@ public final class Constants {
 
         // +X = forward, +Y = left, +Z = up (meters from robot center)
         private static final Translation3d FRONT_RIGHT_CAMERA_TRANSLATION = new Translation3d(
-                Units.inchesToMeters(-10.569981),   // X: forward
-                Units.inchesToMeters(-11.904615),   // Y: left
-                Units.inchesToMeters(-7.703044)  // Z: height
+                Units.inchesToMeters(-8.211985),   // X: forward
+                Units.inchesToMeters(-0.102096),   // Y: left
+                Units.inchesToMeters(17.611942)  // Z: height
         );
         // Camera orientation relative to robot frame (roll, pitch, yaw in degrees)
         private static final Rotation3d FRONT_RIGHT_LIMELIGHT_ROTATION = new Rotation3d(
                 Math.toRadians(0.0),   // roll
-                Math.toRadians(20.0), // pitch (looking slightly up)
-                Math.toRadians(-15)    // yaw (facing slightly right)
+                Math.toRadians(25.0), // pitch (looking slightly up)
+                Math.toRadians(0.0)    // yaw (facing slightly right)
         );
         public static final Transform3d FRONT_RIGHT_LIMELIGHT_TRANSFORM = new Transform3d(
                 FRONT_RIGHT_CAMERA_TRANSLATION,

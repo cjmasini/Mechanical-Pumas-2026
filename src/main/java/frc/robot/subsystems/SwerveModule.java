@@ -22,7 +22,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.PersistMode;
-import com.revrobotics.REVLibError;
 import com.revrobotics.ResetMode;
 
 

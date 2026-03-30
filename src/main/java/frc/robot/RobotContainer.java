@@ -9,8 +9,6 @@ import java.util.List;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,18 +16,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AutoTargetHubCommand;
 import frc.robot.commands.CancelCommand;
-import frc.robot.commands.drive.FaceAprilTagCommand;
 import frc.robot.commands.drive.MoveCommand;
-import frc.robot.commands.indexer.TestCommand;
 import frc.robot.commands.indexer.LoadCommand;
-import frc.robot.commands.indexer.LoadersOnlyCommand;
 import frc.robot.commands.indexer.RevLoadCommand;
 import frc.robot.commands.intake.BuckCommand;
 import frc.robot.commands.intake.DeployIntakeCommand;
-import frc.robot.commands.intake.GoToSetpointCommand;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.StowIntakeCommand;
-import frc.robot.commands.launch.PowerLaunchCommand;
+import frc.robot.commands.launch.AutoShootCommand;
 import frc.robot.commands.launch.VelocityLaunchCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LaunchSubsystem;
@@ -53,6 +47,8 @@ public class RobotContainer {
   private final LoadSubsystem loadSubsystem;
   private final IntakeSubsystem intakeSubsystem;
 
+  private final SendableChooser<Command> autoChooser;
+
   private final CommandXboxController driverXbox = new CommandXboxController(0);
 
   // private final SendableChooser<Command> autoChooser;
@@ -68,15 +64,11 @@ public class RobotContainer {
     intakeSubsystem = new IntakeSubsystem();
     visionSubsystem = new VisionSubsystem(driveSubsystem);
 
-    // Choosers show up on our dashboard and let us modify options before and during
-    // matches
-    // autoChooser = AutoBuilder.buildAutoChooser();
+    autoChooser = AutoBuilder.buildAutoChooser();
 
-    // Setup all controller button mappings
     configureBindings();
 
-    // For choosers (or other info) to show up on the dashboard, they must be added
-    // SmartDashboard.putData(autoChooser);
+    SmartDashboard.putData(autoChooser);
   }
 
   /**
@@ -95,17 +87,24 @@ public class RobotContainer {
     VelocityLaunchCommand launchCommand = new VelocityLaunchCommand(this.launchSubsystem);
     driverXbox.rightBumper().and(driverXbox.rightTrigger().negate()).onTrue(launchCommand);
     NamedCommands.registerCommand("flywheel", launchCommand);
+
     LoadCommand loadCommand = new LoadCommand(this.loadSubsystem);
     driverXbox.rightTrigger().onTrue(loadCommand);
     NamedCommands.registerCommand("load", loadCommand);
+
     RevLoadCommand revLoadCommand = new RevLoadCommand(this.loadSubsystem);
     driverXbox.b().whileTrue(revLoadCommand);
-    NamedCommands.registerCommand("revload", revLoadCommand);
+    NamedCommands.registerCommand("reverseLoad", revLoadCommand);
+
     BuckCommand buckCommand = new BuckCommand(intakeSubsystem);
     driverXbox.a().onTrue(buckCommand);
+    NamedCommands.registerCommand("buck", buckCommand);
 
     AutoTargetHubCommand autoTargetHubCommand = new AutoTargetHubCommand(driveSubsystem, visionSubsystem, driverXbox);
     driverXbox.start().whileTrue(autoTargetHubCommand);
+
+    AutoShootCommand autoShootCommand = new AutoShootCommand(driveSubsystem, launchSubsystem, loadSubsystem, intakeSubsystem, visionSubsystem);
+    NamedCommands.registerCommand("autoShoot", autoShootCommand.withTimeout(5));
 
     DeployIntakeCommand deployIntakeCommand = new DeployIntakeCommand(this.intakeSubsystem);
     driverXbox.x().onTrue(deployIntakeCommand);
@@ -128,9 +127,9 @@ public class RobotContainer {
     driverXbox.rightStick().and(driverXbox.leftStick()).onTrue(resetGyro);
   }
 
-  // Return the auto selected on the dashboard
+  // Return the auto selected on the dashboard, seeding pose from vision first
   public Command getAutonomousCommand() {
-    return new InstantCommand();//autoChooser.getSelected();
+    return autoChooser.getSelected();
   }
 
   public DriveSubsystem getDriveSubsystem() {
