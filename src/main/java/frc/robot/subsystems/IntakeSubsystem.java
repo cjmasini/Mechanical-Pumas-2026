@@ -67,14 +67,12 @@ public class IntakeSubsystem extends CancelableSubsystemBase {
                 PersistMode.kNoPersistParameters);
 
         prepareDeployMotors();
-        initSmartDashboard();
     }
 
-    private void initSmartDashboard() {
-        SmartDashboard.putNumber("Deploy/P", INTAKE_P);
-        SmartDashboard.putNumber("Deploy/I", INTAKE_I);
-        SmartDashboard.putNumber("Deploy/D", INTAKE_D);
-        SmartDashboard.putNumber("Deploy/Setpoint", STOWED_POSITION);
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Deploy/Position", deployEncoder.getPosition());
+        SmartDashboard.putNumber("Deploy/Setpoint", deployPID.getSetpoint());
     }
 
     private void prepareDeployMotors() {

@@ -7,7 +7,7 @@ import frc.robot.subsystems.LoadSubsystem;
  * Command that runs the conveyor and loader motors at full speed for a specified duration.
  * Used for feeding game pieces into the launcher.
  */
-public class RevLoadCommand extends Command {
+public class ReverseLoadCommand extends Command {
 
     private final LoadSubsystem loadSubsystem;
 
@@ -16,7 +16,7 @@ public class RevLoadCommand extends Command {
      *
      * @param loadSubsystem The load subsystem to control
      */
-    public RevLoadCommand(LoadSubsystem loadSubsystem) {
+    public ReverseLoadCommand(LoadSubsystem loadSubsystem) {
         this.loadSubsystem = loadSubsystem;
         addRequirements(loadSubsystem);
     }

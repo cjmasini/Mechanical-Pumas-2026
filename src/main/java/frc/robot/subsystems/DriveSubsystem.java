@@ -114,6 +114,8 @@ public class DriveSubsystem extends CancelableSubsystemBase {
 
     logPose("Odometry", getPose());
     SmartDashboard.putNumber("gyroOrientation", getGyroOrientation());
+    SmartDashboard.putNumber("Debug/RawHeading", getHeading());
+    SmartDashboard.putNumber("Debug/PoseHeading", getPose().getRotation().getDegrees());
 
     // Fault monitoring for FL and BR modules (the problematic ones)
     logModuleDiagnostics("FL", frontLeftModule);
@@ -203,7 +205,7 @@ public class DriveSubsystem extends CancelableSubsystemBase {
    *                      Whether the robot is in field relative mode
    */
   public void driveAndOrient(double xSpeed, double ySpeed, double target, boolean fieldRelative) {
-    double currentHeading = this.getHeading();
+    double currentHeading = this.getPose().getRotation().getDegrees();
     double targetHeading = SwerveUtils.normalizeAngle(target);
 
     // The left stick controls translation of the robot.

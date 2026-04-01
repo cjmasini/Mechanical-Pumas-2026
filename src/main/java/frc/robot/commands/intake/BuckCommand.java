@@ -1,50 +1,23 @@
 package frc.robot.commands.intake;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.IntakeSubsystem;
 
 /**
  * Command that bucks the intake to dislodge stuck fuel
  */
-public class BuckCommand extends Command {
+public class BuckCommand extends SequentialCommandGroup {
 
-    private final IntakeSubsystem intakeSubsystem;
-    private boolean buckingIntake = false;
 
     /**
      * Creates a new ShootAndBuckCommand.
+     * Starts intake, moves to buck position, deploys intake, then stops intake
      *
      * @param intakeSubsystem The intake subsystem to control for bucking
      */
     public BuckCommand(IntakeSubsystem intakeSubsystem) {
-        this.intakeSubsystem = intakeSubsystem;
         addRequirements(intakeSubsystem);
-    }
-
-    @Override
-    public void initialize() {
-        buckingIntake = true;
-        intakeSubsystem.setIntakeSpeed(1);
-    }
-
-    @Override
-    public void execute() {
-        if (buckingIntake) {
-            if (intakeSubsystem.buckIntake()) {
-                buckingIntake = false;
-            }
-        } else {
-            intakeSubsystem.deployIntake();
-        }
-    }
-
-    @Override
-    public boolean isFinished() {
-        return !buckingIntake && intakeSubsystem.isDeployed();
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        intakeSubsystem.cancel();
+        this.addCommands(new IntakeCommand(intakeSubsystem), new BuckIntakeCommand(intakeSubsystem), new DeployIntakeCommand(intakeSubsystem), new InstantCommand(() -> intakeSubsystem.setIntakeSpeed(0), intakeSubsystem));
     }
 }

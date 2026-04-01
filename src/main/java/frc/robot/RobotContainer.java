@@ -18,7 +18,7 @@ import frc.robot.commands.AutoTargetHubCommand;
 import frc.robot.commands.CancelCommand;
 import frc.robot.commands.drive.MoveCommand;
 import frc.robot.commands.indexer.LoadCommand;
-import frc.robot.commands.indexer.RevLoadCommand;
+import frc.robot.commands.indexer.ReverseLoadCommand;
 import frc.robot.commands.intake.BuckCommand;
 import frc.robot.commands.intake.DeployIntakeCommand;
 import frc.robot.commands.intake.IntakeCommand;
@@ -92,7 +92,7 @@ public class RobotContainer {
     driverXbox.rightTrigger().onTrue(loadCommand);
     NamedCommands.registerCommand("load", loadCommand);
 
-    RevLoadCommand revLoadCommand = new RevLoadCommand(this.loadSubsystem);
+    ReverseLoadCommand revLoadCommand = new ReverseLoadCommand(this.loadSubsystem);
     driverXbox.b().whileTrue(revLoadCommand);
     NamedCommands.registerCommand("reverseLoad", revLoadCommand);
 
@@ -109,6 +109,7 @@ public class RobotContainer {
     DeployIntakeCommand deployIntakeCommand = new DeployIntakeCommand(this.intakeSubsystem);
     driverXbox.x().onTrue(deployIntakeCommand);
     NamedCommands.registerCommand("deploy", deployIntakeCommand);
+    // intakeSubsystem.setDefaultCommand(deployIntakeCommand);
 
     StowIntakeCommand stowIntakeCommand = new StowIntakeCommand(intakeSubsystem);
     driverXbox.y().onTrue(stowIntakeCommand);
